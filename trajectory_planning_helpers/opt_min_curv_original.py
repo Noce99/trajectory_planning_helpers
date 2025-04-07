@@ -1,10 +1,7 @@
-# This library file has been modified to use the cvxopt solver instead of the quadprog solver.
-# The file is injected into the site-packages folder of the `raceline` miniconda environment.
-
 import numpy as np
 import math
 import quadprog
-import cvxopt
+# import cvxopt
 import time
 
 
@@ -299,29 +296,16 @@ def opt_min_curv(reftrack: np.ndarray,
     t_start = time.perf_counter()
 
     # solve problem (CVXOPT) -------------------------------------------------------------------------------------------
-    args = [cvxopt.matrix(H), cvxopt.matrix(f), cvxopt.matrix(G), cvxopt.matrix(h)]
-    sol = cvxopt.solvers.qp(*args)
-
-    if 'optimal' not in sol['status']:
-        print("WARNING: Optimal solution not found!")
-
-    alpha_mincurv = np.array(sol['x']).reshape((H.shape[1],))
+    # args = [cvxopt.matrix(H), cvxopt.matrix(f), cvxopt.matrix(G), cvxopt.matrix(h)]
+    # sol = cvxopt.solvers.qp(*args)
+    #
+    # if 'optimal' not in sol['status']:
+    #     print("WARNING: Optimal solution not found!")
+    #
+    # alpha_mincurv = np.array(sol['x']).reshape((H.shape[1],))
 
     # solve problem (quadprog) -----------------------------------------------------------------------------------------
-
-    # ----- TESTS -----
-    # Dmat = H
-    # dvec = -f
-    # Amat = -G.T
-    # bvec = -h
-    # Calculate euclidean norm of dvec
-    # dvec_norm = np.linalg.norm(dvec)
-    # Dmat = Dmat / dvec_norm
-    # dvec = dvec / dvec_norm
-    # alpha_mincurv = quadprog.solve_qp(Dmat, dvec, Amat, bvec, 0)[0]
-    # ----- END TESTS -----
-
-    # alpha_mincurv = quadprog.solve_qp(H, -f, -G.T, -h, 0)[0]
+    alpha_mincurv = quadprog.solve_qp(H, -f, -G.T, -h, 0)[0]
 
     # print runtime into console window
     if print_debug:
